@@ -1,4 +1,5 @@
 import pool from '../db/db.js'
+import gerarToken from '../Utils/jwt.js';
 
 function isValidEmail(email) {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -8,7 +9,6 @@ function isValidEmail(email) {
 export const criarUsuario = async (req, res) => {
     try{
         const { nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco } = req.body;
-        console.log(nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco)
 
         if(isValidEmail(email)){
 
@@ -17,7 +17,17 @@ export const criarUsuario = async (req, res) => {
                  VALUES ($1, $2, $3, $4, $5, $6, $7)`,
                 [nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco]
               );
-              res.send('Usuário inserido com sucesso');
+            
+            const usuario = await pool.query(
+                `SELECT * FROM usuario WHERE creci=$1`, [creci] 
+            )
+
+            const token = gerarToken(usuario.rows[0])
+            res.json({
+                data: usuario.rows[0],
+                token: token,
+                msg: "Usuário cadastrado com sucesso"
+            });
         }
 
         else{
@@ -25,20 +35,9 @@ export const criarUsuario = async (req, res) => {
         }
     }
     catch(err){
-        if(err.detail.includes("(creci)")){
             console.error(err.message);
-            res.status(400).send('Erro ao cadastrar usuário, CRECI já utilizado');
-        }
+            res.status(400).send('Erro ao cadastar usuário, email ou creci já casdastrados');
 
-        else if(err.detail.includes("(email)")){
-            console.error(err.message);
-            res.status(400).send('Erro ao cadastrar usuário, email já utilizado');
-        }
-
-        else{
-            console.error(err.code, err.message);
-            res.status(500).send('Erro ao cadastrar usuário');
-        }
     }
 
 }
@@ -54,9 +53,29 @@ export const getUsuarios = async (req, res) => {
       }
 }
 
-/*export const atualizarUsuario = async (req, res) => {
-    
-}*/
+export const atualizarUsuario = async (req, res) => {
+    try{
+        const {telefone, Endereco_idEndereco } = req.body;
+        const id = req.params.usuarioId;
+        if(!isNaN(id)){
+            try{
+                const usuario = await pool.query(`UPDATE usuario SET telefone=$1, Endereco_idEndereco=$2 WHERE idusuario=$3`, [telefone, Endereco_idEndereco, id]);
+                res.json("Usuario atualizado com sucesso")
+            }
+            catch(err){
+                console.log(err)
+                res.status(500).json("Erro ao procurar usuário")
+            }
+        }
+        else{
+            res.status(400).json("Id de usuário inválido");
+        }
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).json("Erro ao atualizar usuário");
+    }
+}
 
 export const deletarUsuario = async (req, res) => {
     try{
@@ -78,7 +97,7 @@ export const deletarUsuario = async (req, res) => {
           } 
         else {
             res.status(400).json("Id de usuário inválido");
-          }
+        }
     }
     catch(err){
         console.error(err.message);
@@ -86,3 +105,55 @@ export const deletarUsuario = async (req, res) => {
     }
 }
 
+export const login = async (req, res) =>{
+    try{
+        const {email, senha} = req.body
+        const usuario = await pool.query(`SELECT idusuario FROM usuario WHERE email=$1 AND senha=$2`, [email, senha])
+        var token = null;
+        if(usuario.rowCount > 0){
+            
+            token = gerarToken(usuario.rows[0])
+            res.json({
+              data: usuario.rows[0],
+              token: token,
+              msg: "Login realizado com sucesso"
+            });
+        }
+
+        else{
+            res.status(400).json("Email ou senha não conferem")
+        }
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json('Erro ao fazer login');
+    }
+}
+
+export const getUsuarioPorId = async (req, res) =>{
+    try{    
+        const id = req.params.usuarioId;
+        if(!isNaN(id)){
+            try{
+                const usuario = await pool.query(`SELECT * FROM usuario WHERE idusuario=$1`, [id]);
+
+                if(usuario.rowCount > 0){
+                    res.json(usuario.rows);
+                }
+                else{
+                    res.status(400).json("Usuário não encontrado")
+                }
+            }
+            catch(err){
+                res.statu(500).json("Erro ao procurar usuário")
+            }
+        }
+        else{
+            res.status(400).json("Id de usuário inválido");
+        }
+        
+    }
+    catch(err){
+        res.statu(500).json("Erro ao procurar usuário")
+    }
+}
