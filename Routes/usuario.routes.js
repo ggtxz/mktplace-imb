@@ -1,6 +1,6 @@
 import express from "express"
 import * as usuarioController from '../Controllers/usuario.controller.js';
-import autorizarUsuario from "../MIddlewares/auth.middleware.js";
+import autorizarUsuario from "../Middlewares/auth.middleware.js";
 
 const router = express.Router();
 
