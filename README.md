@@ -25,7 +25,7 @@ npm install
 JWT_SECRET='e525c84ccc7f079ef7e4f54e398d9cbd36f027ff3341d15a1fc38cf06cda428ab70002d437582277e31248fb950468e34cfa3a7010004c63f6f677241018c2f3'
 ``` 
 
-3. Crie o arquivo db.js na pasta db com o seguinte conteúdo:
+3. Crie uma pasta db e dentro dela o arquivo db.js com o seguinte conteúdo:
 ```js
 import pkg from 'pg';
 const { Pool } = pkg;
