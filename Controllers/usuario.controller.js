@@ -1,21 +1,22 @@
 import pool from '../db/db.js'
 import gerarToken from '../Utils/jwt.js';
 
+// Função para validar email do usuário
 function isValidEmail(email) {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
   }
 
+// Cria usuário
 export const criarUsuario = async (req, res) => {
     try{
-        const { nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco } = req.body;
-
+        const { nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco } = req.body;
         if(isValidEmail(email)){
 
             const cadastro = await pool.query(
-                `INSERT INTO usuario (nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco) 
+                `INSERT INTO usuario (nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco) 
                  VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                [nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco]
+                [nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco]
               );
             
             const usuario = await pool.query(
@@ -42,6 +43,7 @@ export const criarUsuario = async (req, res) => {
 
 }
 
+// Lê usuarios
 export const getUsuarios = async (req, res) => {
     try{
         const result = await pool.query('SELECT * FROM usuario');
@@ -53,19 +55,15 @@ export const getUsuarios = async (req, res) => {
       }
 }
 
+// atualiza informações dos usuários
 export const atualizarUsuario = async (req, res) => {
     try{
-        const {telefone, Endereco_idEndereco } = req.body;
+        const {telefone, endereco_idendereco } = req.body;
         const id = req.params.usuarioId;
+        // verifica se o id é válido
         if(!isNaN(id)){
-            try{
-                const usuario = await pool.query(`UPDATE usuario SET telefone=$1, Endereco_idEndereco=$2 WHERE idusuario=$3`, [telefone, Endereco_idEndereco, id]);
-                res.json("Usuario atualizado com sucesso")
-            }
-            catch(err){
-                console.log(err)
-                res.status(500).json("Erro ao procurar usuário")
-            }
+            const usuario = await pool.query(`UPDATE usuario SET telefone=$1, endereco_idendereco=$2 WHERE idusuario=$3`, [telefone, endereco_idendereco, id]);
+            res.json("Usuario atualizado com sucesso")
         }
         else{
             res.status(400).json("Id de usuário inválido");
@@ -77,22 +75,18 @@ export const atualizarUsuario = async (req, res) => {
     }
 }
 
+// deleta usuário
 export const deletarUsuario = async (req, res) => {
     try{
         const id = Number(req.params.usuarioId);
+        // verifica se o id é válido
         if (!isNaN(id)) {
-            try {
-                const result = await pool.query('DELETE FROM usuario WHERE idusuario=$1', [id]);
-                if (result.rowCount > 0) {
-                    res.json("Usuário deletado com sucesso");
-                } 
-                else {
-                    res.status(404).json("Usuário não encontrado");
-                }
+            const result = await pool.query('DELETE FROM usuario WHERE idusuario=$1', [id]);
+            if (result.rowCount > 0) {
+                res.json("Usuário deletado com sucesso");
             } 
-            catch (error) {
-                console.error('Erro ao deletar usuário:', error);
-                res.status(500).json("Erro ao deletar usuário");
+            else {
+                res.status(404).json("Usuário não encontrado");
             }
           } 
         else {
@@ -105,6 +99,7 @@ export const deletarUsuario = async (req, res) => {
     }
 }
 
+// autentica o usuário
 export const login = async (req, res) =>{
     try{
         const {email, senha} = req.body
@@ -130,22 +125,20 @@ export const login = async (req, res) =>{
     }
 }
 
+
+// lê um único usuário através do ID
 export const getUsuarioPorId = async (req, res) =>{
     try{    
         const id = req.params.usuarioId;
+        // verifica se o id é válido
         if(!isNaN(id)){
-            try{
-                const usuario = await pool.query(`SELECT * FROM usuario WHERE idusuario=$1`, [id]);
+            const usuario = await pool.query(`SELECT * FROM usuario WHERE idusuario=$1`, [id]);
 
-                if(usuario.rowCount > 0){
-                    res.json(usuario.rows);
-                }
-                else{
-                    res.status(400).json("Usuário não encontrado")
-                }
+            if(usuario.rowCount > 0){
+                res.json(usuario.rows);
             }
-            catch(err){
-                res.statu(500).json("Erro ao procurar usuário")
+            else{
+                res.status(400).json("Usuário não encontrado")
             }
         }
         else{

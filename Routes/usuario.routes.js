@@ -4,11 +4,11 @@ import autorizarUsuario from "../Middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get('/', usuarioController.getUsuarios) //Read
 router.post('/', usuarioController.criarUsuario) //Create
+router.get('/', usuarioController.getUsuarios) //Read
+router.get('/:usuarioId', usuarioController.getUsuarioPorId) //Read
+router.put('/:usuarioId', autorizarUsuario, usuarioController.atualizarUsuario) //Update
 router.delete('/:usuarioId', usuarioController.deletarUsuario) //Delete
 router.post('/login', usuarioController.login)
-router.get('/:usuarioId', autorizarUsuario, usuarioController.getUsuarioPorId)
-router.put('/:usuarioId', usuarioController.atualizarUsuario) //Update
 
 export default router;

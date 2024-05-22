@@ -23,12 +23,9 @@ npm install
 2. Crie um arquivo .env na raiz do projeto e adicione o seguinte conteúdo:
 ```plaintext
 JWT_SECRET='e525c84ccc7f079ef7e4f54e398d9cbd36f027ff3341d15a1fc38cf06cda428ab70002d437582277e31248fb950468e34cfa3a7010004c63f6f677241018c2f3'
-
-SQL_PASSWORD='senha'
 ``` 
-SQL_PASSWORD: senha do usuário que você está utilizando para acessar o Postgres  
 
-3. Configure o arquivo db.js na pasta db:
+3. Crie uma pasta db e dentro dela o arquivo db.js com o seguinte conteúdo:
 ```js
 import pkg from 'pg';
 const { Pool } = pkg;
@@ -37,15 +34,17 @@ const pool = new Pool({
   user: 'user', // nome de usuário do Banco de Dados
   host: 'localhost', 
   database: 'mktplace_imb', // Nome do Banco de dados
-  password: process.env.SQL_PASSWORD,
+  password: 'sua senha do postgres', // Senha do Banco de dados
   port: 5432, // Porta padrão do PostgreSQL
 });
 
 export default pool;
 ```
-user: coloque seu usuário do Banco de Dados
+user: coloque seu usuário do Postgres
 
 database: nome do banco de dados
+
+password: coloque sua senha do Postgres
 
 ## Executando o Servidor
 Após concluir os passos de instalação, você pode executar o servidor utilizando o seguinte comando:
