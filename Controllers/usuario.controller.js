@@ -58,14 +58,8 @@ export const atualizarUsuario = async (req, res) => {
         const {telefone, Endereco_idEndereco } = req.body;
         const id = req.params.usuarioId;
         if(!isNaN(id)){
-            try{
-                const usuario = await pool.query(`UPDATE usuario SET telefone=$1, Endereco_idEndereco=$2 WHERE idusuario=$3`, [telefone, Endereco_idEndereco, id]);
-                res.json("Usuario atualizado com sucesso")
-            }
-            catch(err){
-                console.log(err)
-                res.status(500).json("Erro ao procurar usuário")
-            }
+            const usuario = await pool.query(`UPDATE usuario SET telefone=$1, Endereco_idEndereco=$2 WHERE idusuario=$3`, [telefone, Endereco_idEndereco, id]);
+            res.json("Usuario atualizado com sucesso")
         }
         else{
             res.status(400).json("Id de usuário inválido");
@@ -81,18 +75,13 @@ export const deletarUsuario = async (req, res) => {
     try{
         const id = Number(req.params.usuarioId);
         if (!isNaN(id)) {
-            try {
-                const result = await pool.query('DELETE FROM usuario WHERE idusuario=$1', [id]);
-                if (result.rowCount > 0) {
-                    res.json("Usuário deletado com sucesso");
-                } 
-                else {
-                    res.status(404).json("Usuário não encontrado");
-                }
+
+            const result = await pool.query('DELETE FROM usuario WHERE idusuario=$1', [id]);
+            if (result.rowCount > 0) {
+                res.json("Usuário deletado com sucesso");
             } 
-            catch (error) {
-                console.error('Erro ao deletar usuário:', error);
-                res.status(500).json("Erro ao deletar usuário");
+            else {
+                res.status(404).json("Usuário não encontrado");
             }
           } 
         else {
@@ -134,18 +123,13 @@ export const getUsuarioPorId = async (req, res) =>{
     try{    
         const id = req.params.usuarioId;
         if(!isNaN(id)){
-            try{
-                const usuario = await pool.query(`SELECT * FROM usuario WHERE idusuario=$1`, [id]);
+            const usuario = await pool.query(`SELECT * FROM usuario WHERE idusuario=$1`, [id]);
 
-                if(usuario.rowCount > 0){
-                    res.json(usuario.rows);
-                }
-                else{
-                    res.status(400).json("Usuário não encontrado")
-                }
+            if(usuario.rowCount > 0){
+                res.json(usuario.rows);
             }
-            catch(err){
-                res.statu(500).json("Erro ao procurar usuário")
+            else{
+                res.status(400).json("Usuário não encontrado")
             }
         }
         else{
