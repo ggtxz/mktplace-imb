@@ -10,13 +10,13 @@ function isValidEmail(email) {
 // Cria usuário
 export const criarUsuario = async (req, res) => {
     try{
-        const { nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco } = req.body;
+        const { nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco } = req.body;
         if(isValidEmail(email)){
 
             const cadastro = await pool.query(
-                `INSERT INTO usuario (nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco) 
+                `INSERT INTO usuario (nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco) 
                  VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                [nome, email, senha, creci, telefone, plano_idPlano, Endereco_idEndereco]
+                [nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco]
               );
             
             const usuario = await pool.query(
@@ -58,11 +58,11 @@ export const getUsuarios = async (req, res) => {
 // atualiza informações dos usuários
 export const atualizarUsuario = async (req, res) => {
     try{
-        const {telefone, Endereco_idEndereco } = req.body;
+        const {telefone, endereco_idendereco } = req.body;
         const id = req.params.usuarioId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const usuario = await pool.query(`UPDATE usuario SET telefone=$1, Endereco_idEndereco=$2 WHERE idusuario=$3`, [telefone, Endereco_idEndereco, id]);
+            const usuario = await pool.query(`UPDATE usuario SET telefone=$1, endereco_idendereco=$2 WHERE idusuario=$3`, [telefone, endereco_idendereco, id]);
             res.json("Usuario atualizado com sucesso")
         }
         else{

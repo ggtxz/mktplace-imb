@@ -1,4 +1,4 @@
-/*import pool from '../db/db.js'
+import pool from '../db/db.js'
 
 
 // Create
@@ -48,4 +48,4 @@ export const deletarImovel = async (req, res) => {
     catch(err){
         
     }    
-}*/
+}
