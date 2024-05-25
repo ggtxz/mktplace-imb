@@ -2,17 +2,19 @@ import pool from '../db/db.js'
 
 
 // Create
-export const criarcorretor = async (req, res) => {
+export const criarCorretor = async (req, res) => {
     try{
-        // transformar id usuario em unique
         const {independente, imobiliaria_idimobiliaria, usuario_idusuario} = req.body
-        const cadastro = await pool.query(`INSERT INTO corretor (independente, imobiliaria_idimobiliaria, usuario_idusuario) VALUES ($1, $2, $3)`, [independente, imobiliaria_idimobiliaria, usuario_idusuario]);
-        const corretor = await pool.query(
-            `SELECT * FROM corretor WHERE usuario_idusuario=$1`, [usuario_idusuario] 
-        )
+        const cadastro = await pool.query(
+            `INSERT INTO corretor (independente, imobiliaria_idimobiliaria, usuario_idusuario) 
+            VALUES ($1, $2, $3) 
+            RETURNING *`, 
+            [independente, imobiliaria_idimobiliaria, usuario_idusuario]);
+
+        const novoCorretor = cadastro.rows[0];
 
         res.json({
-            data: corretor.rows[0],
+            data: novoCorretor,
             msg: "Corretor cadastrado com sucesso"
         });
     }
@@ -25,7 +27,10 @@ export const criarcorretor = async (req, res) => {
 // Read
 export const getCorretores = async (req, res) => {
     try{
-        const result = await pool.query('SELECT * FROM corretor');
+        const result = await pool.query(
+            `SELECT * 
+            FROM corretor`);
+
         res.json(result.rows);
     }
     catch(err){
@@ -39,7 +44,11 @@ export const getCorretorPorId = async (req, res) => {
         const id = req.params.corretorId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const corretor = await pool.query(`SELECT * FROM corretor WHERE id=$1`, [id]);
+            const corretor = await pool.query(
+                `SELECT * 
+                FROM corretor 
+                WHERE id=$1`, 
+                [id]);
 
             if(corretor.rowCount > 0){
                 res.json(corretor.rows);
@@ -65,8 +74,24 @@ export const atualizarCorretor = async (req, res) => {
         const id = req.params.corretorId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const corretor = await pool.query(`UPDATE corretor SET independente=$1, imobiliaria_idimobiliaria=$2 WHERE id=$3`, [independente, imobiliaria_idimobiliaria, id]);
-            res.json("Corretor atualizado com sucesso")
+            const corretor = await pool.query(
+                `UPDATE corretor 
+                SET independente=$1, imobiliaria_idimobiliaria=$2 
+                WHERE id=$3
+                RETURNING *`, 
+                [independente, imobiliaria_idimobiliaria, id]);
+
+            const attCorretor = corretor.rows[0]
+
+            if(corretor.rowCount > 0){
+                res.json({
+                    msg: "Corretor atualizado com sucesso",
+                    corretor: attCorretor
+                });
+            }
+            else{
+                res.status(400).json("Corretor não encontrado")
+            }
         }
         else{
             res.status(400).json("Id de corretor inválido");
@@ -85,9 +110,14 @@ export const deletarCorretor = async (req, res) => {
         // verifica se o id é válido
         if (!isNaN(id)) {
 
-            const result = await pool.query('DELETE FROM corretor WHERE id=$1', [id]);
+            const result = await pool.query(
+                `DELETE 
+                FROM corretor 
+                WHERE id=$1`, 
+                [id]);
+                
             if (result.rowCount > 0) {
-                res.json("Corretor deletada com sucesso");
+                res.json("Corretor deletado com sucesso");
             } 
             else {
                 res.status(404).json("corretor não encontrada");

@@ -5,13 +5,16 @@ import pool from '../db/db.js'
 export const criarImobiliaria = async (req, res) => {
     try{
         const { nome, usuario_idusuario } = req.body
-        const cadastro = await pool.query(`INSERT INTO imobiliaria (nome, usuario_idusuario) VALUES ($1, $2)`, [nome, usuario_idusuario]);
-        const imobiliaria = await pool.query(
-            `SELECT * FROM imobiliaria WHERE usuario_idusuario=$1`, [usuario_idusuario] 
-        )
+        const cadastro = await pool.query(
+            `INSERT INTO imobiliaria (nome, usuario_idusuario) 
+            VALUES ($1, $2) 
+            RETURNING *`, 
+            [nome, usuario_idusuario]);
+
+        const novaImb = cadastro.rows[0];
 
         res.json({
-            data: imobiliaria.rows[0],
+            data: novaImb,
             msg: "Imobiliaria cadastrado com sucesso"
         });
     }
@@ -24,7 +27,10 @@ export const criarImobiliaria = async (req, res) => {
 // Read
 export const getImobiliarias = async (req, res) => {
     try{
-        const result = await pool.query('SELECT * FROM imobiliaria');
+        const result = await pool.query(
+            `SELECT * 
+            FROM imobiliaria`);
+
         res.json(result.rows);
     }
     catch(err){
@@ -38,7 +44,11 @@ export const getImobiliariaPorId = async (req, res) => {
         const id = req.params.imobiliariaId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const imobiliaria = await pool.query(`SELECT * FROM imobiliaria WHERE idimobiliaria=$1`, [id]);
+            const imobiliaria = await pool.query(
+                `SELECT * 
+                FROM imobiliaria 
+                WHERE idimobiliaria=$1`, 
+                [id]);
 
             if(imobiliaria.rowCount > 0){
                 res.json(imobiliaria.rows);
@@ -64,8 +74,24 @@ export const atualizarImobiliaria = async (req, res) => {
         const id = req.params.imobiliariaId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const imobiliaria = await pool.query(`UPDATE imobiliaria SET nome=$1 WHERE idimobiliaria=$2`, [nome, id]);
-            res.json("Usuario atualizado com sucesso")
+            const imobiliaria = await pool.query(
+                `UPDATE imobiliaria 
+                SET nome=$1 
+                WHERE idimobiliaria=$2 
+                RETURNING *`, 
+                [nome, id]);
+
+            const attImobiliaria = imobiliaria.rows[0]
+
+            if(imobiliaria.rowCount > 0){
+                res.json({
+                    msg: "Imobiliária atualizado com sucesso",
+                    imobiliaria: attImobiliaria
+                });
+            }
+            else{
+                res.status(400).json("Imobiliária não encontrado")
+            }
         }
         else{
             res.status(400).json("Id de usuário inválido");
@@ -84,7 +110,12 @@ export const deletarImobiliaria = async (req, res) => {
         // verifica se o id é válido
         if (!isNaN(id)) {
 
-            const result = await pool.query('DELETE FROM imobiliaria WHERE idimobiliaria=$1', [id]);
+            const result = await pool.query(
+                `DELETE 
+                FROM imobiliaria 
+                WHERE idimobiliaria=$1`, 
+                [id]);
+                
             if (result.rowCount > 0) {
                 res.json("Imobiliária deletada com sucesso");
             } 
