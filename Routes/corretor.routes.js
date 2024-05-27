@@ -5,7 +5,7 @@ import autorizarUsuario from "../Middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.post('/', corretorController.criarcorretor) //Create
+router.post('/', corretorController.criarCorretor) //Create
 router.get('/', corretorController.getCorretores) //Read
 router.get('/:corretorId', corretorController.getCorretorPorId) //Read
 router.put('/:corretorId', corretorController.atualizarCorretor) //Update

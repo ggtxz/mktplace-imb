@@ -54,12 +54,48 @@ npm run dev
 
 ## API Endpoints
 
+Usuário:
+
 -`POST /usuario/`: Cria/Cadastra um usuário  
 -`POST /usuario/login`: Realiza o login do usuário  
 -`GET /usuario/`: Obtém todos usuários  
 -`GET /usuario/:usuarioId`: Obtém as informações de um usuário específico  
 -`PUT /usuario/:usuarioId`: Atualiza informações do usuário  
 -`DELETE /usuario/:usuarioId`: Deleta um usuário  
+
+Corretor:
+
+-`POST /corretor/`: Cria/Cadastra um corretor  
+-`GET /corretor/`: Obtém todos corretores  
+-`GET /corretor/:corretorId`: Obtém as informações de um corretor específico  
+-`PUT /corretor/:corretorId`: Atualiza informações do corretor  
+-`DELETE /corretor/:corretorId`: Deleta um corretor 
+
+Imobiliária:
+
+-`POST /imobiliaria/`: Cria/Cadastra um imobiliária  
+-`GET /imobiliaria/`: Obtém todas imobiliarias  
+-`GET /imobiliaria/:imobiliariaId`: Obtém as informações de um imobiliária específica  
+-`PUT /imobiliaria/:imobiliariaId`: Atualiza informações da imobiliária  
+-`DELETE /imobiliaria/:imobiliariaId`: Deleta uma imobiliária
+
+Endereço:
+
+-`POST /endereco/`: Cria/Cadastra um endereço  
+-`GET /endereco/`: Obtém todos endereços   
+-`GET /endereco/:enderecoId`: Obtém as informações de um endereço específico  
+-`PUT /endereco/:enderecoId`: Atualiza informações do endereço  
+-`DELETE /endereco/:enderecoId`: Deleta um endereço
+
+Imóvel:
+
+-`POST /imovel/`: Cria/Cadastra um imóvel  
+-`GET /imovel/`: Obtém todos imoveis  
+-`GET /imovel/:imovelId`: Obtém as informações de um imóvel específico  
+-`PUT /imovel/:imovelId`: Atualiza informações do imóvel  
+-`DELETE /imovel/:imovelId`: Deleta um imóvel 
+
+(Faltando as imagens e tour)
 
 -Mais endpoints em breve
 

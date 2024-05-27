@@ -15,17 +15,17 @@ export const criarUsuario = async (req, res) => {
 
             const cadastro = await pool.query(
                 `INSERT INTO usuario (nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco) 
-                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)
+                 RETURNING *`,
                 [nome, email, senha, creci, telefone, plano_idPlano, endereco_idendereco]
               );
-            
-            const usuario = await pool.query(
-                `SELECT * FROM usuario WHERE creci=$1`, [creci] 
-            )
 
-            const token = gerarToken(usuario.rows[0])
+            const novoUsuario = cadastro.rows[0];
+
+            const token = gerarToken(novoUsuario)
+
             res.json({
-                data: usuario.rows[0],
+                data: novoUsuario,
                 token: token,
                 msg: "Usuário cadastrado com sucesso"
             });
@@ -46,7 +46,10 @@ export const criarUsuario = async (req, res) => {
 // Lê usuarios
 export const getUsuarios = async (req, res) => {
     try{
-        const result = await pool.query('SELECT * FROM usuario');
+        const result = await pool.query(
+            `SELECT * 
+            FROM usuario`);
+
         res.json(result.rows);
     }
     catch (err) {
@@ -62,8 +65,25 @@ export const atualizarUsuario = async (req, res) => {
         const id = req.params.usuarioId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const usuario = await pool.query(`UPDATE usuario SET telefone=$1, endereco_idendereco=$2 WHERE idusuario=$3`, [telefone, endereco_idendereco, id]);
-            res.json("Usuario atualizado com sucesso")
+            const usuario = await pool.query(
+                `UPDATE usuario 
+                SET telefone=$1, endereco_idendereco=$2 
+                WHERE idusuario=$3 
+                RETURNING *`, 
+                [telefone, endereco_idendereco, id]);
+
+            const attUsuario = usuario.rows[0]
+
+            if(usuario.rowCount > 0){
+                res.json({
+                    msg: "Usuário atualizado com sucesso",
+                    usuario: attUsuario
+                });
+            }
+            else{Endereço
+                Endereço
+                res.status(400).json("Usuário não encontrado")
+            }
         }
         else{
             res.status(400).json("Id de usuário inválido");
@@ -81,7 +101,12 @@ export const deletarUsuario = async (req, res) => {
         const id = Number(req.params.usuarioId);
         // verifica se o id é válido
         if (!isNaN(id)) {
-            const result = await pool.query('DELETE FROM usuario WHERE idusuario=$1', [id]);
+            const result = await pool.query(
+                `DELETE 
+                FROM usuario 
+                WHERE idusuario=$1`, 
+                [id]);
+
             if (result.rowCount > 0) {
                 res.json("Usuário deletado com sucesso");
             } 
@@ -103,7 +128,12 @@ export const deletarUsuario = async (req, res) => {
 export const login = async (req, res) =>{
     try{
         const {email, senha} = req.body
-        const usuario = await pool.query(`SELECT idusuario FROM usuario WHERE email=$1 AND senha=$2`, [email, senha])
+        const usuario = await pool.query(
+            `SELECT idusuario 
+            FROM usuario 
+            WHERE email=$1 AND senha=$2`, 
+            [email, senha])
+
         var token = null;
         if(usuario.rowCount > 0){
             
@@ -132,7 +162,11 @@ export const getUsuarioPorId = async (req, res) =>{
         const id = req.params.usuarioId;
         // verifica se o id é válido
         if(!isNaN(id)){
-            const usuario = await pool.query(`SELECT * FROM usuario WHERE idusuario=$1`, [id]);
+            const usuario = await pool.query(
+                `SELECT * 
+                FROM usuario 
+                WHERE idusuario=$1`, 
+                [id]);
 
             if(usuario.rowCount > 0){
                 res.json(usuario.rows);
